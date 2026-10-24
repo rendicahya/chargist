@@ -19,7 +19,7 @@ export const translations = {
     chargerTypeLabel: 'Tipe Charger',
     chargerPowerLabel: 'Daya Charger',
     efficiencyLabel: 'Efisiensi Pengisian',
-    efficiencyConservative: '85% (konservatif)',
+    efficiencyConservative: '60% (konservatif)',
     efficiencyOptimal: '95% (optimal)',
 
     // Tab labels & tooltips
@@ -104,6 +104,7 @@ export const translations = {
     errorMinutes: 'Menit harus antara 0–59.',
     errorTimeEmpty: 'Masukkan waktu yang tersedia.',
     errorBudgetZero: 'Biaya harus lebih dari Rp0.',
+    errorBatteryFull: 'Baterai sudah penuh.',
 
     // Misc
     progressBarLabel: 'Segmen berwarna = energi yang akan diisi',
@@ -143,7 +144,7 @@ export const translations = {
     chargerTypeLabel: 'Charger Type',
     chargerPowerLabel: 'Charger Power',
     efficiencyLabel: 'Charging Efficiency',
-    efficiencyConservative: '85% (conservative)',
+    efficiencyConservative: '60% (conservative)',
     efficiencyOptimal: '95% (optimal)',
 
     // Tab labels & tooltips
@@ -228,6 +229,7 @@ export const translations = {
     errorMinutes: 'Minutes must be between 0–59.',
     errorTimeEmpty: 'Please enter the available charging time.',
     errorBudgetZero: 'Budget must be greater than Rp0.',
+    errorBatteryFull: 'Battery is already full.',
 
     // Misc
     progressBarLabel: 'Colored segment = energy to be charged',
@@ -248,9 +250,26 @@ export const translations = {
   },
 };
 
+// localStorage bisa melempar error (private mode, storage diblokir), jadi jangan sampai app gagal dimuat
+function readLang() {
+  try {
+    const stored = localStorage.getItem('lang');
+    return stored in translations ? stored : 'id';
+  } catch {
+    return 'id';
+  }
+}
+
+function writeLang(lang) {
+  try {
+    localStorage.setItem('lang', lang);
+  } catch {
+    // abaikan kegagalan tulis
+  }
+}
+
 export const langStore = (() => {
-  const stored = localStorage.getItem('lang') ?? 'id';
-  let _lang = stored;
+  let _lang = readLang();
   let _subscribers = [];
 
   return {
@@ -261,7 +280,7 @@ export const langStore = (() => {
     },
     toggle() {
       _lang = _lang === 'id' ? 'en' : 'id';
-      localStorage.setItem('lang', _lang);
+      writeLang(_lang);
       _subscribers.forEach(s => s(_lang));
     },
     get() { return _lang; }

@@ -23,6 +23,7 @@
   $: budgetError = validateBudget({ budget }, T);
   $: result = !budgetError ? calcBudget({ budget, tariffPerKwh, chargerPower, batteryCapacity, currentBattery, pbjt_rate, efficiency }) : null;
   $: evPreset = selectedEV !== 'custom' ? EV_PRESETS.find(p => p.label === selectedEV) : null;
+  $: batteryFull = sharedValid && currentBattery >= 100;
   $: showResult = sharedValid && !budgetError && result !== null && result.energyToBattery > 0;
 
   $: timeLabel = result
@@ -30,12 +31,13 @@
       (result.chargingMinutes > 0 ? ` ${result.chargingMinutes} ${T.menitUnit}` : '')).trim() || T.lessThanOneMinute
     : '';
 
-  $: if (showResult && result && onResult) {
-    onResult({
+  // Kirim null saat hasil tidak valid supaya data sesi lama tidak ikut tersimpan
+  $: if (onResult) {
+    onResult(showResult ? {
       energyFromGrid: result.energyFromGrid,
       cost: result.actualCost,
       batteryEnd: result.finalBattery,
-    });
+    } : null);
   }
 </script>
 
@@ -49,6 +51,7 @@
 {#if !budgetError && pbjt_rate > 0}
   <p class="text-xs text-slate-400 -mt-1">{T.budgetPbjtInfo}</p>
 {/if}
+{#if batteryFull}<p class="text-xs text-red-500 -mt-1">{T.errorBatteryFull}</p>{/if}
 
 {#if result}
   <ProgressBar

@@ -1,37 +1,25 @@
 <script>
-  import { EV_PRESETS, CHARGER_PRESETS, HOME_TARIFFS, SPKLU_TARIFF } from '../lib/constants.js';
-  import { persisted, persist } from '../lib/persist.js';
+  import { EV_PRESETS, CHARGER_PRESETS, HOME_TARIFFS } from '../lib/constants.js';
   import SliderInput from './SliderInput.svelte';
   import NumberInput from './NumberInput.svelte';
 
-  export let batteryCapacity, currentBattery, tariffPerKwh, chargerPower;
+  export let batteryCapacity, currentBattery, chargerPower;
   export let batteryCapacityError, chargerPowerError, currentBatteryError;
   export let location;
   export let selectedEV;
+  export let homeDaya;
   export let efficiency;
   export let T;
 
-  let selectedCharger = persisted('selectedCharger', CHARGER_PRESETS.find(p => p.power === chargerPower)?.label ?? 'custom');
-  export let homeDaya = persisted('homeDaya', HOME_TARIFFS[2].label);
-
-  $: persist('selectedEV', selectedEV);
-  $: persist('selectedCharger', selectedCharger);
-  $: persist('homeDaya', homeDaya);
+  // Diturunkan dari daya charger supaya selalu sinkron dengan nilai yang dihitung (termasuk dari URL)
+  let selectedCharger = CHARGER_PRESETS.find(p => p.power === chargerPower)?.label ?? 'custom';
 
   function onLocationChange(val) {
     location = val;
-    if (val === 'spklu') {
-      tariffPerKwh = SPKLU_TARIFF;
-    } else {
-      const preset = HOME_TARIFFS.find(t => t.label === homeDaya);
-      if (preset) tariffPerKwh = preset.tariff;
-    }
   }
 
   function onHomeDayaChange(e) {
     homeDaya = e.target.value;
-    const preset = HOME_TARIFFS.find(t => t.label === homeDaya);
-    if (preset) tariffPerKwh = preset.tariff;
   }
 
   function onEVChange(e) {
@@ -205,7 +193,7 @@
       id="efficiency"
       label={T.efficiencyLabel}
       bind:value={efficiency}
-      min={0.85} max={0.95} step={0.01}
+      min={0.6} max={0.95} step={0.01}
       displayValue="{Math.round(efficiency * 100)}%"
       tickMin={T.efficiencyConservative}
       tickMax={T.efficiencyOptimal}

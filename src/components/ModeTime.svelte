@@ -20,7 +20,8 @@
   export let onResult = null;
 
   $: result = calcTime({ batteryCapacity, currentBattery, chargerPower, availableHours, availableMinutes, tariffPerKwh, pbjt_rate, efficiency });
-  $: showResult = sharedValid && !timeError && !availableHoursError && !availableMinutesError && (availableHours > 0 || availableMinutes > 0);
+  $: batteryFull = sharedValid && currentBattery >= 100;
+  $: showResult = sharedValid && !batteryFull && !timeError && !availableHoursError && !availableMinutesError && (availableHours > 0 || availableMinutes > 0);
   $: evPreset = selectedEV !== 'custom' ? EV_PRESETS.find(p => p.label === selectedEV) : null;
 
   $: timeLabel = result
@@ -29,15 +30,16 @@
     : '';
 
   // Apakah pengisian selesai sebelum waktu tersedia habis
-  $: chargeComplete = result && (result.actualHours < availableHours ||
-    (result.actualHours === availableHours && result.actualMinutes < availableMinutes));
+  $: chargeComplete = result &&
+    result.actualHours * 60 + result.actualMinutes < availableHours * 60 + availableMinutes;
 
-  $: if (showResult && result && onResult) {
-    onResult({
+  // Kirim null saat hasil tidak valid supaya data sesi lama tidak ikut tersimpan
+  $: if (onResult) {
+    onResult(showResult ? {
       energyFromGrid: result.energyFromGrid,
       cost: result.totalCost,
       batteryEnd: result.finalBattery,
-    });
+    } : null);
   }
 </script>
 
@@ -60,6 +62,7 @@
     />
   </div>
   {#if timeError}<p class="text-xs text-red-500 mt-0.5">{timeError}</p>{/if}
+  {#if batteryFull}<p class="text-xs text-red-500 mt-0.5">{T.errorBatteryFull}</p>{/if}
 </div>
 
 <ProgressBar mode="time" {currentBattery} finalBattery={result.finalBattery} batteryGained={result.batteryGained} {T} />

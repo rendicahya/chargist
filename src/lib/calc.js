@@ -6,12 +6,17 @@ export function formatRupiah(val) {
   }).format(val);
 }
 
+// Bulatkan ke menit terdekat dulu supaya tidak muncul "1 jam 60 menit"
+export function splitHours(timeHours) {
+  const totalMinutes = Math.round(timeHours * 60);
+  return { hours: Math.floor(totalMinutes / 60), minutes: totalMinutes % 60 };
+}
+
 export function calcTarget({ batteryCapacity, currentBattery, targetBattery, chargerPower, tariffPerKwh, pbjt_rate, efficiency = 0.90 }) {
   const energyNeeded = Math.max(0, ((targetBattery - currentBattery) / 100) * batteryCapacity);
   const energyFromGrid = energyNeeded / efficiency; // energi dari PLN lebih besar karena losses
   const chargingTime = chargerPower > 0 ? energyFromGrid / chargerPower : 0;
-  const chargingHours = Math.floor(chargingTime);
-  const chargingMinutes = Math.round((chargingTime - chargingHours) * 60);
+  const { hours: chargingHours, minutes: chargingMinutes } = splitHours(chargingTime);
   const energyCost = energyFromGrid * tariffPerKwh;
   const pbjt = energyCost * pbjt_rate;
   const totalCost = energyCost + pbjt;
@@ -32,8 +37,7 @@ export function calcTime({ batteryCapacity, currentBattery, chargerPower, availa
   // Waktu aktual berdasarkan energi ke baterai yang dibutuhkan
   const actualEnergyFromGrid = Math.min(energyFromGrid, maxEnergy / efficiency);
   const actualTimeHours = chargerPower > 0 ? actualEnergyFromGrid / chargerPower : 0;
-  const actualHours = Math.floor(actualTimeHours);
-  const actualMinutes = Math.round((actualTimeHours - actualHours) * 60);
+  const { hours: actualHours, minutes: actualMinutes } = splitHours(actualTimeHours);
 
   const energyCost = actualEnergyFromGrid * tariffPerKwh;
   const pbjt = energyCost * pbjt_rate;
@@ -47,12 +51,11 @@ export function calcBudget({ budget, tariffPerKwh, chargerPower, batteryCapacity
   // Energi ke baterai dari anggaran, setelah PBJT-TL dan efisiensi
   const rawEnergyFromGrid = budget / (tariffPerKwh * (1 + pbjt_rate));
   const rawEnergyToBattery = rawEnergyFromGrid * efficiency;
-  const energyToBattery = Math.floor(Math.min(rawEnergyToBattery, maxEnergyToBattery));
+  const energyToBattery = Math.min(rawEnergyToBattery, maxEnergyToBattery);
   if (energyToBattery <= 0) return null;
   const energyFromGrid = energyToBattery / efficiency;
   const chargingTime = chargerPower > 0 ? energyFromGrid / chargerPower : 0;
-  const chargingHours = Math.floor(chargingTime);
-  const chargingMinutes = Math.round((chargingTime - chargingHours) * 60);
+  const { hours: chargingHours, minutes: chargingMinutes } = splitHours(chargingTime);
   const batteryGained = batteryCapacity > 0 ? (energyToBattery / batteryCapacity) * 100 : 0;
   const finalBattery = Math.min(100, currentBattery + batteryGained);
   const energyCost = energyFromGrid * tariffPerKwh;

@@ -1,5 +1,5 @@
 <script>
-  import { DEFAULTS } from './lib/constants.js';
+  import { DEFAULTS, EV_PRESETS, HOME_TARIFFS, SPKLU_TARIFF } from './lib/constants.js';
   import { validateShared, validateTarget, validateTime } from './lib/validation.js';
   import SharedInputs from './components/SharedInputs.svelte';
   import ModeTarget from './components/ModeTarget.svelte';
@@ -9,13 +9,14 @@
   import { PBJT_TL_RATE } from './lib/constants.js';
   import { persisted, persist } from './lib/persist.js';
   import { CHARGING_EFFICIENCY } from './lib/constants.js';
-  import { stateToUrl, urlToState } from './lib/url.js';
+  import { sanitizeStateValue, stateToUrl, urlToState } from './lib/url.js';
   import { langStore, t } from './lib/i18n.js';
   import HistoryTab from './components/HistoryTab.svelte';
   import SaveSessionButton from './components/SaveSessionButton.svelte';
 
   const urlState = urlToState({});
-  const g = (key, def) => urlState[key] ?? persisted(key, def);
+  // URL diutamakan, lalu localStorage; nilai yang tidak valid jatuh ke default
+  const g = (key, def) => urlState[key] ?? sanitizeStateValue(key, persisted(key)) ?? def;
 
   let activeTab        = g('tab', 'target');
   let location         = g('location', 'spklu');
@@ -28,13 +29,20 @@
   let budget           = g('budget', DEFAULTS.budget);
   let efficiency       = g('efficiency', CHARGING_EFFICIENCY);
   let selectedEV       = g('selectedEV', 'custom');
-  let tariffPerKwh     = g('tariffPerKwh', DEFAULTS.tariffPerKwh);
+  let homeDaya         = g('homeDaya', HOME_TARIFFS[2].label);
   let lang = 'id';
   let sessionResult = null;
+
+  // Preset EV harus cocok dengan kapasitasnya; jika tidak, anggap custom agar kapasitas bisa diedit
+  const initialEV = EV_PRESETS.find(p => p.label === selectedEV);
+  if (initialEV && initialEV.capacity !== batteryCapacity) selectedEV = 'custom';
 
   langStore.subscribe(l => lang = l);
 
   $: T = t(lang);
+  $: tariffPerKwh = location === 'spklu'
+    ? SPKLU_TARIFF
+    : HOME_TARIFFS.find(h => h.label === homeDaya).tariff;
   $: shared = validateShared({ batteryCapacity, chargerPower, currentBattery }, T);
   $: targetBatteryError = validateTarget({ targetBattery, currentBattery }, T);
   $: timeErrors = validateTime({ availableHours, availableMinutes }, T);
@@ -42,7 +50,7 @@
   $: activePBJTRate = location === 'spklu' ? PBJT_TL_RATE : 0;
   
   $: {
-    persist('activeTab', activeTab);
+    persist('tab', activeTab);
     persist('location', location);
     persist('batteryCapacity', batteryCapacity);
     persist('currentBattery', currentBattery);
@@ -53,7 +61,7 @@
     persist('budget', budget);
     persist('efficiency', efficiency);
     persist('selectedEV', selectedEV);
-    persist('tariffPerKwh', tariffPerKwh);
+    persist('homeDaya', homeDaya);
   }
 
   $: stateToUrl({
@@ -68,7 +76,7 @@
     budget,
     efficiency,
     selectedEV,
-    tariffPerKwh,
+    homeDaya,
   });
   
   $: tabs = [
@@ -115,8 +123,8 @@
   <main class="max-w-2xl mx-auto px-4 py-8 space-y-6">
 
     <SharedInputs
-      bind:batteryCapacity bind:currentBattery bind:tariffPerKwh bind:chargerPower
-      bind:location bind:selectedEV bind:efficiency
+      bind:batteryCapacity bind:currentBattery bind:chargerPower
+      bind:location bind:selectedEV bind:efficiency bind:homeDaya
       batteryCapacityError={shared.batteryCapacityError}
       chargerPowerError={shared.chargerPowerError}
       currentBatteryError={shared.currentBatteryError}
@@ -189,7 +197,7 @@
           evModel: selectedEV !== 'custom' ? selectedEV : null,
           batteryCapacity,
           batteryStart: currentBattery,
-          batteryEnd: activeTab === 'target' ? targetBattery : (sessionResult.batteryEnd ?? currentBattery),
+          batteryEnd: Math.round(sessionResult.batteryEnd * 10) / 10,
           energyFromGrid: sessionResult.energyFromGrid,
           cost: sessionResult.cost,
           location,

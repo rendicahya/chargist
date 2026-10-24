@@ -1,4 +1,6 @@
 <script>
+  import { clamp } from '../lib/validation.js';
+
   export let id;
   export let label;
   export let value;
@@ -13,6 +15,17 @@
   export let warning = null; // teks peringatan opsional
   export let warningThreshold = null; // nilai trigger peringatan
   export let displayValue = null; // override tampilan nilai jika perlu
+
+  // Geser nilai satu step; dibulatkan ke jumlah desimal step supaya tidak muncul 0.8200000001
+  function nudge(direction) {
+    const decimals = (String(step).split('.')[1] ?? '').length;
+    value = clamp(Number((value + direction * step).toFixed(decimals)), min, max);
+  }
+
+  const stepButtonClass = `w-8 h-8 shrink-0 rounded-lg border border-slate-200 bg-slate-50
+    text-slate-600 font-bold leading-none hover:bg-emerald-50 hover:text-emerald-600
+    disabled:opacity-40 disabled:pointer-events-none transition-colors
+    focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400`;
 </script>
 
 <div class="flex flex-col gap-2">
@@ -25,11 +38,18 @@
       </span>
     </span>
   </div>
-  <input {id} type="range" bind:value {min} {max} {step}
-    class="w-full h-2 rounded-full appearance-none cursor-pointer
-           bg-slate-200 accent-emerald-500" />
+  <div class="flex items-center gap-3">
+    <button type="button" class={stepButtonClass} aria-label="{label} −"
+      disabled={value <= min} on:click={() => nudge(-1)}>−</button>
+    <input {id} type="range" bind:value {min} {max} {step}
+      class="w-full h-2 rounded-full appearance-none cursor-pointer
+             bg-slate-200 accent-emerald-500" />
+    <button type="button" class={stepButtonClass} aria-label="{label} +"
+      disabled={value >= max} on:click={() => nudge(1)}>+</button>
+  </div>
   {#if tickMin !== null || tickMid !== null || tickMax !== null}
-    <div class="flex justify-between text-xs text-slate-400">
+    <!-- px-11 = lebar tombol (w-8) + gap (gap-3), supaya tick sejajar dengan slider -->
+    <div class="flex justify-between text-xs text-slate-400 px-11">
       <span>{tickMin ?? min}{unit}</span>
       {#if tickMid !== null}<span>{tickMid}{unit}</span>{/if}
       <span>{tickMax ?? max}{unit}</span>

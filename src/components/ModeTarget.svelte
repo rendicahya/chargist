@@ -28,12 +28,13 @@
     return (h + m).trim() || T.lessThanOneMinute;
   })();
 
-  $: if (showResult && result && onResult) {
-    onResult({
+  // Kirim null saat hasil tidak valid supaya data sesi lama tidak ikut tersimpan
+  $: if (onResult) {
+    onResult(showResult ? {
       energyFromGrid: result.energyFromGrid,
       cost: result.totalCost,
       batteryEnd: targetBattery,
-    });
+    } : null);
   }
 </script>
 

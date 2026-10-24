@@ -4,7 +4,7 @@
   export let T;
   export let energyFromGrid;   // kWh dari PLN
   export let energyToBattery;  // kWh masuk baterai
-  export let efficiency;       // 0.85–0.95
+  export let efficiency;       // 0.60–0.95
 </script>
 
 <div class="bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-4 space-y-3">

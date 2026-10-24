@@ -5,7 +5,6 @@ export const CHARGING_EFFICIENCY = 0.90;
 export const DEFAULTS = {
   batteryCapacity: 60,
   currentBattery: 40,
-  tariffPerKwh: 2466.78,
   chargerPower: 7.7,
   targetBattery: 80,
   availableHours: 1,
