@@ -23,13 +23,15 @@ export const translations = {
     efficiencyOptimal: '95% (optimal)',
 
     // Tab labels & tooltips
-    tabTarget: '🎯 Target',
-    tabTime: '⏱️ Waktu',
-    tabBudget: '💰 Anggaran',
-    tabHistory: '📋 Riwayat',
+    tabTarget: 'Target',
+    tabTime: 'Waktu',
+    tabBudget: 'Anggaran',
+    tabEnergy: 'Energi',
+    tabHistory: 'Riwayat',
     tooltipTarget: 'Tentukan target % baterai yang ingin dicapai. App akan menghitung energi, waktu, dan biaya yang dibutuhkan.',
     tooltipTime: 'Masukkan berapa lama waktu yang tersedia untuk mengisi daya. App akan menghitung seberapa penuh baterai dan biayanya.',
     tooltipBudget: 'Masukkan anggaran biaya yang dimiliki. App akan menghitung energi dan % baterai yang bisa didapat.',
+    tooltipEnergy: 'Masukkan jumlah kWh yang tertera di SPKLU atau meteran. App akan menghitung biaya, waktu, dan % baterai yang didapat.',
     tooltipHistory: 'Lihat log pengisian dan statistik penggunaan listrik kamu.',
 
     // Save session
@@ -87,6 +89,11 @@ export const translations = {
     budgetPbjtInfo: 'Sudah termasuk PBJT-TL 10%',
     chargingTimeEst: 'Waktu Pengisian',
 
+    // Mode Energi
+    energyKwhLabel: 'Energi dari PLN',
+    energyKwhInfo: 'Angka kWh yang tertera di layar SPKLU atau meteran',
+    warningEnergyOverCapacity: 'Energi ini melebihi sisa kapasitas baterai. Baterai akan penuh sebelum seluruh energi terpakai.',
+
     // Result
     costBreakdown: 'Rincian Biaya',
     energyCostLabel: 'Biaya Energi',
@@ -105,6 +112,7 @@ export const translations = {
     errorTimeEmpty: 'Masukkan waktu yang tersedia.',
     errorBudgetZero: 'Biaya harus lebih dari Rp0.',
     errorBatteryFull: 'Baterai sudah penuh.',
+    errorEnergyZero: 'Energi harus lebih dari 0 kWh.',
 
     // Misc
     progressBarLabel: 'Segmen berwarna = energi yang akan diisi',
@@ -148,13 +156,15 @@ export const translations = {
     efficiencyOptimal: '95% (optimal)',
 
     // Tab labels & tooltips
-    tabTarget: '🎯 Target',
-    tabTime: '⏱️ Time',
-    tabBudget: '💰 Budget',
-    tabHistory: '📋 History',
+    tabTarget: 'Target',
+    tabTime: 'Time',
+    tabBudget: 'Budget',
+    tabEnergy: 'Energy',
+    tabHistory: 'History',
     tooltipTarget: 'Set a target battery %. The app will calculate the energy, time, and cost needed.',
     tooltipTime: 'Enter how long you have to charge. The app will calculate how full the battery gets and the cost.',
     tooltipBudget: 'Enter your budget. The app will calculate how much energy and battery % you can get.',
+    tooltipEnergy: 'Enter the kWh shown on the charging station or meter. The app will calculate the cost, time, and battery % gained.',
     tooltipHistory: 'View your charging log and electricity usage statistics.',
 
         // Save session
@@ -212,6 +222,11 @@ export const translations = {
     budgetPbjtInfo: 'Includes PBJT-TL 10%',
     chargingTimeEst: 'Charging Time',
 
+    // Mode Energy
+    energyKwhLabel: 'Energy from Grid',
+    energyKwhInfo: 'The kWh shown on the charging station or meter display',
+    warningEnergyOverCapacity: 'This energy exceeds the remaining battery capacity. The battery will be full before all of it is used.',
+
     // Result
     costBreakdown: 'Cost Breakdown',
     energyCostLabel: 'Energy Cost',
@@ -230,6 +245,7 @@ export const translations = {
     errorTimeEmpty: 'Please enter the available charging time.',
     errorBudgetZero: 'Budget must be greater than Rp0.',
     errorBatteryFull: 'Battery is already full.',
+    errorEnergyZero: 'Energy must be greater than 0 kWh.',
 
     // Misc
     progressBarLabel: 'Colored segment = energy to be charged',

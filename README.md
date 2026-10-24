@@ -19,7 +19,7 @@ Sebelum melakukan perhitungan, pastikan Anda telah mengisi data dasar di bagian 
 
 ## 2. Fitur Utama (Mode Kalkulasi & Riwayat)
 
-Aplikasi ini memiliki empat fitur inti yang dapat diakses melalui tab di bagian tengah:
+Aplikasi ini memiliki lima fitur inti yang dapat diakses melalui tab di bagian tengah:
 
 ### 🎯 Mode Target
 Gunakan mode ini untuk mengetahui biaya dan waktu yang dibutuhkan untuk mencapai target baterai tertentu.
@@ -39,9 +39,15 @@ Gunakan mode ini jika Anda ingin mengisi daya dengan nominal uang tertentu.
 2.  Masukkan nominal **Biaya yang Tersedia** (dalam Rupiah).
 3.  Aplikasi akan menghitung persentase baterai yang bisa didapatkan dan estimasi waktunya.
 
+### ⚡ Mode Energi
+Gunakan mode ini jika Anda sudah tahu jumlah kWh yang diisi, misalnya dari layar SPKLU atau meteran.
+1.  Pilih tab **Energi**.
+2.  Masukkan **Energi dari PLN** (dalam kWh) sesuai angka yang tertera.
+3.  Aplikasi akan menghitung total biaya, estimasi waktu, dan persentase baterai akhir. Hasilnya juga bisa disimpan ke Riwayat.
+
 ### 📋 Riwayat Pengisian
 Fitur ini berfungsi untuk mencatat dan melacak semua aktivitas pengisian daya Anda.
-- **Simpan Sesi**: Setelah melakukan perhitungan di mode Target/Waktu/Anggaran, tekan tombol **Simpan Sesi**.
+- **Simpan Sesi**: Setelah melakukan perhitungan di mode Target/Waktu/Anggaran/Energi, tekan tombol **Simpan Sesi**.
 - **Data Tersimpan**: Di tab Riwayat, Anda dapat melihat log tanggal, lokasi, jumlah energi, dan biaya pengisian.
 - **Statistik**: Lihat ringkasan penggunaan seperti total energi yang dihabiskan dan rata-rata biaya per sesi/hari/minggu/bulan.
 *Catatan: Data riwayat disimpan secara lokal di browser Anda.*

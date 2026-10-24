@@ -25,6 +25,11 @@ export function validateBudget({ budget }, T) {
   return '';
 }
 
+export function validateEnergy({ energyKwh }, T) {
+  if (!(energyKwh > 0)) return T.errorEnergyZero;
+  return '';
+}
+
 export function clamp(val, min, max) {
   return Math.min(Math.max(val, min), max);
 }

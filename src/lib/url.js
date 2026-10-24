@@ -9,11 +9,12 @@ const NUMERIC_RANGES = {
   availableHours: [0, 24],
   availableMinutes: [0, 59],
   budget: [0, 99999999],
+  energyKwh: [0, 9999],
   efficiency: [0.6, 0.95],
 };
 
 const ALLOWED_VALUES = {
-  tab: ['target', 'time', 'budget', 'history'],
+  tab: ['target', 'time', 'budget', 'energy', 'history'],
   location: ['home', 'spklu'],
   selectedEV: [...EV_PRESETS.map(p => p.label), 'custom'],
   homeDaya: HOME_TARIFFS.map(t => t.label),
@@ -29,6 +30,7 @@ const PARAM_KEYS = {
   availableHours: 'hr',
   availableMinutes: 'min',
   budget: 'bdg',
+  energyKwh: 'kwh',
   efficiency: 'eff',
   selectedEV: 'ev',
   homeDaya: 'daya',

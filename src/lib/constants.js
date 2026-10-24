@@ -10,6 +10,7 @@ export const DEFAULTS = {
   availableHours: 1,
   availableMinutes: 0,
   budget: 50000,
+  energyKwh: 20,
 };
 
 export const EV_PRESETS = [

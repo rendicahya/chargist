@@ -64,6 +64,22 @@ export function calcBudget({ budget, tariffPerKwh, chargerPower, batteryCapacity
   return { energyToBattery, energyFromGrid, chargingHours, chargingMinutes, batteryGained, finalBattery, energyCost, pbjt, actualCost };
 }
 
+// energyKwh = kWh yang tertera di SPKLU/meteran (sisi PLN), jadi biaya dihitung dari angka ini apa adanya
+export function calcEnergy({ energyKwh, batteryCapacity, currentBattery, chargerPower, tariffPerKwh, pbjt_rate, efficiency = 0.90 }) {
+  const maxEnergyToBattery = batteryCapacity * (1 - currentBattery / 100);
+  const rawEnergyToBattery = energyKwh * efficiency;
+  const energyToBattery = Math.min(rawEnergyToBattery, maxEnergyToBattery);
+  const exceedsCapacity = rawEnergyToBattery > maxEnergyToBattery;
+  const chargingTime = chargerPower > 0 ? energyKwh / chargerPower : 0;
+  const { hours: chargingHours, minutes: chargingMinutes } = splitHours(chargingTime);
+  const batteryGained = batteryCapacity > 0 ? (energyToBattery / batteryCapacity) * 100 : 0;
+  const finalBattery = Math.min(100, currentBattery + batteryGained);
+  const energyCost = energyKwh * tariffPerKwh;
+  const pbjt = energyCost * pbjt_rate;
+  const totalCost = energyCost + pbjt;
+  return { energyFromGrid: energyKwh, energyToBattery, exceedsCapacity, chargingHours, chargingMinutes, batteryGained, finalBattery, energyCost, pbjt, totalCost };
+}
+
 export function calcRange(fullRange, batteryPercent) {
   return Math.round(fullRange * batteryPercent / 100);
 }

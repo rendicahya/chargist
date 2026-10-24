@@ -5,6 +5,7 @@
   import ModeTarget from './components/ModeTarget.svelte';
   import ModeTime from './components/ModeTime.svelte';
   import ModeBudget from './components/ModeBudget.svelte';
+  import ModeEnergy from './components/ModeEnergy.svelte';
   import Tooltip from './components/Tooltip.svelte';
   import { PBJT_TL_RATE } from './lib/constants.js';
   import { persisted, persist } from './lib/persist.js';
@@ -27,6 +28,7 @@
   let availableHours   = g('availableHours', DEFAULTS.availableHours);
   let availableMinutes = g('availableMinutes', DEFAULTS.availableMinutes);
   let budget           = g('budget', DEFAULTS.budget);
+  let energyKwh        = g('energyKwh', DEFAULTS.energyKwh);
   let efficiency       = g('efficiency', CHARGING_EFFICIENCY);
   let selectedEV       = g('selectedEV', 'custom');
   let homeDaya         = g('homeDaya', HOME_TARIFFS[2].label);
@@ -59,6 +61,7 @@
     persist('availableHours', availableHours);
     persist('availableMinutes', availableMinutes);
     persist('budget', budget);
+    persist('energyKwh', energyKwh);
     persist('efficiency', efficiency);
     persist('selectedEV', selectedEV);
     persist('homeDaya', homeDaya);
@@ -74,19 +77,22 @@
     availableHours,
     availableMinutes,
     budget,
+    energyKwh,
     efficiency,
     selectedEV,
     homeDaya,
   });
   
   $: tabs = [
-    { id: 'target', label: T.tabTarget, tooltip: T.tooltipTarget },
-    { id: 'time',   label: T.tabTime,   tooltip: T.tooltipTime   },
-    { id: 'budget', label: T.tabBudget, tooltip: T.tooltipBudget },
-    { id: 'history', label: T.tabHistory, tooltip: T.tooltipHistory },
+    { id: 'target',  icon: '🎯', label: T.tabTarget,  tooltip: T.tooltipTarget  },
+    { id: 'time',    icon: '⏱️', label: T.tabTime,    tooltip: T.tooltipTime    },
+    { id: 'budget',  icon: '💰', label: T.tabBudget,  tooltip: T.tooltipBudget  },
+    { id: 'energy',  icon: '⚡', label: T.tabEnergy,  tooltip: T.tooltipEnergy  },
+    { id: 'history', icon: '📋', label: T.tabHistory, tooltip: T.tooltipHistory },
   ];
 
-  $: modeTitle = tabs.find(t => t.id === activeTab)?.label ?? '';
+  $: activeTabInfo = tabs.find(t => t.id === activeTab);
+  $: modeTitle = activeTabInfo ? `${activeTabInfo.icon} ${activeTabInfo.label}` : '';
 
   function onModeResult(data) {
     sessionResult = data;
@@ -132,14 +138,17 @@
     />
 
   <!-- Tab Switcher -->
-    <div class="bg-white rounded-2xl shadow-md border border-slate-100 p-2 flex gap-2">
+    <div class="bg-white rounded-2xl shadow-md border border-slate-100 p-1.5 sm:p-2 flex gap-1 sm:gap-2">
       {#each tabs as tab}
-        <div class="flex-1 flex flex-col items-center gap-1">
+        <div class="flex-1 min-w-0 flex flex-col items-center gap-1">
+          <!-- Di layar sempit ikon ditaruh di atas label supaya 5 tab tetap muat -->
           <button
-            class="w-full py-2.5 px-3 rounded-xl text-sm font-semibold transition-all duration-200
+            class="w-full py-2 sm:py-2.5 px-1 sm:px-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200
+              flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5
               {activeTab === tab.id ? 'bg-emerald-500 text-white shadow' : 'text-slate-500 hover:bg-slate-50'}"
             on:click={() => onTabChange(tab.id)}>
-            {tab.label}
+            <span aria-hidden="true">{tab.icon}</span>
+            <span class="truncate max-w-full">{tab.label}</span>
           </button>
           <Tooltip text={tab.tooltip} />
         </div>
@@ -180,6 +189,15 @@
           <ModeBudget
             {batteryCapacity} {currentBattery} {chargerPower} {tariffPerKwh} {selectedEV} {efficiency}
             bind:budget
+            {sharedValid}
+            pbjt_rate={activePBJTRate}
+            {T}
+            onResult={onModeResult}
+          />
+        {:else if activeTab === 'energy'}
+          <ModeEnergy
+            {batteryCapacity} {currentBattery} {chargerPower} {tariffPerKwh} {selectedEV} {efficiency}
+            bind:energyKwh
             {sharedValid}
             pbjt_rate={activePBJTRate}
             {T}
